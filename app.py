@@ -156,73 +156,78 @@ def detect_frequencies(audio_data, freq_map, unused_freqs, segment_duration=0.5,
             detected_message.append(detected_character)
     return ''.join(detected_message)
 
-# Streamlit App
-st.title("SonicVault: Message Encoder and Decoder")
+def main():
+    # Streamlit App
+    st.title("SonicVault: Message Encoder and Decoder")
+    
+    # Encoding section
+    st.header("Encoding Section")
+    message = st.text_input("Enter the message to encode:")
+    
+    if "buttons_shown" not in st.session_state:
+        st.session_state.buttons_shown = False
+    
+    # Encoding section
+    if st.button("Encode"):
+        if message:
+            freq_map, unused_freqs = dynamic_frequency_allocation()
+            composite_wave = create_composite_wave(message.upper(), freq_map, unused_freqs)
+            encryption_key, encoded_key = write_encryption_key()
+            encrypted_freq_data = encrypt_frequency_key_file(freq_map, unused_freqs, encryption_key)
+    
+            # Create BytesIO for each file and ZIP
+            wav_io = BytesIO()
+            write(wav_io, 44100, composite_wave)
+            wav_io.seek(0)
+    
+            freq_key_io = BytesIO(encrypted_freq_data)
+            encryption_key_io = BytesIO(encoded_key.encode())
+    
+            # Create a ZIP file to bundle all files
+            zip_io = BytesIO()
+            with zipfile.ZipFile(zip_io, "w") as zip_file:
+                zip_file.writestr("composite_message.wav", wav_io.getvalue())
+                zip_file.writestr("frequency_key_encrypted.json", freq_key_io.getvalue())
+                zip_file.writestr("encryption_key.key", encryption_key_io.getvalue())
+            zip_io.seek(0)
+    
+            # Display a single download button for the ZIP file
+            st.download_button("Download All Files", zip_io, "encoded_files.zip", "application/zip", key="download_zip_file")
+    
+        else:
+            st.error("Please enter a message.")
+    
+    
+    # Keep buttons visible even if Encode is clicked
+    if st.session_state.buttons_shown:
+        st.download_button("Download All Files", zip_io, "encoded_files.zip", "application/zip")
+    
+    # Decoding section
+    st.header("Decoding Section")
+    uploaded_wav_file = st.file_uploader("Upload WAV file", type=["wav"])
+    uploaded_freq_key_file = st.file_uploader("Upload Frequency Key File", type=["json"])
+    uploaded_encryption_key_file = st.file_uploader("Upload Encryption Key File", type=["key"])
+    
+    if st.button("Decode"):
+        if uploaded_wav_file and uploaded_freq_key_file and uploaded_encryption_key_file:
+            # Load encryption key
+            encryption_key = base64.b64decode(uploaded_encryption_key_file.getvalue())
+            
+            # Load and decrypt frequency key file
+            encrypted_freq_data = uploaded_freq_key_file.getvalue()
+            freq_map, unused_freqs = decrypt_frequency_key_file(encrypted_freq_data, encryption_key)
+            
+            # Read WAV file
+            sample_rate, audio_data = wavfile.read(uploaded_wav_file)
+            if audio_data.dtype == np.int16:
+                audio_data = audio_data.astype(np.float32) / 32768.0
+            
+            # Decode message
+            decoded_message = detect_frequencies(audio_data, freq_map, unused_freqs, sample_rate=sample_rate)
+            st.write("Decoded Message:", decoded_message)
+        else:
+            st.error("Please upload all required files.")
 
-# Encoding section
-st.header("Encoding Section")
-message = st.text_input("Enter the message to encode:")
-
-if "buttons_shown" not in st.session_state:
-    st.session_state.buttons_shown = False
-
-# Encoding section
-if st.button("Encode"):
-    if message:
-        freq_map, unused_freqs = dynamic_frequency_allocation()
-        composite_wave = create_composite_wave(message.upper(), freq_map, unused_freqs)
-        encryption_key, encoded_key = write_encryption_key()
-        encrypted_freq_data = encrypt_frequency_key_file(freq_map, unused_freqs, encryption_key)
-
-        # Create BytesIO for each file and ZIP
-        wav_io = BytesIO()
-        write(wav_io, 44100, composite_wave)
-        wav_io.seek(0)
-
-        freq_key_io = BytesIO(encrypted_freq_data)
-        encryption_key_io = BytesIO(encoded_key.encode())
-
-        # Create a ZIP file to bundle all files
-        zip_io = BytesIO()
-        with zipfile.ZipFile(zip_io, "w") as zip_file:
-            zip_file.writestr("composite_message.wav", wav_io.getvalue())
-            zip_file.writestr("frequency_key_encrypted.json", freq_key_io.getvalue())
-            zip_file.writestr("encryption_key.key", encryption_key_io.getvalue())
-        zip_io.seek(0)
-
-        # Display a single download button for the ZIP file
-        st.download_button("Download All Files", zip_io, "encoded_files.zip", "application/zip", key="download_zip_file")
-
-    else:
-        st.error("Please enter a message.")
-
-
-# Keep buttons visible even if Encode is clicked
-if st.session_state.buttons_shown:
-    st.download_button("Download All Files", zip_io, "encoded_files.zip", "application/zip")
-
-# Decoding section
-st.header("Decoding Section")
-uploaded_wav_file = st.file_uploader("Upload WAV file", type=["wav"])
-uploaded_freq_key_file = st.file_uploader("Upload Frequency Key File", type=["json"])
-uploaded_encryption_key_file = st.file_uploader("Upload Encryption Key File", type=["key"])
-
-if st.button("Decode"):
-    if uploaded_wav_file and uploaded_freq_key_file and uploaded_encryption_key_file:
-        # Load encryption key
-        encryption_key = base64.b64decode(uploaded_encryption_key_file.getvalue())
-        
-        # Load and decrypt frequency key file
-        encrypted_freq_data = uploaded_freq_key_file.getvalue()
-        freq_map, unused_freqs = decrypt_frequency_key_file(encrypted_freq_data, encryption_key)
-        
-        # Read WAV file
-        sample_rate, audio_data = wavfile.read(uploaded_wav_file)
-        if audio_data.dtype == np.int16:
-            audio_data = audio_data.astype(np.float32) / 32768.0
-        
-        # Decode message
-        decoded_message = detect_frequencies(audio_data, freq_map, unused_freqs, sample_rate=sample_rate)
-        st.write("Decoded Message:", decoded_message)
-    else:
-        st.error("Please upload all required files.")
+if __name__ == "__main__":
+    main()
+    

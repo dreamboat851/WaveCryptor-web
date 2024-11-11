@@ -12,15 +12,6 @@ from cryptography.hazmat.primitives import padding
 from io import BytesIO
 import zipfile
 
-import subprocess
-
-# Launch Streamlit as a subprocess
-subprocess.Popen(["streamlit", "run", "app.py", "--server.port=8000", "--server.headless=true"])
-
-# Just to keep the process running (useful for server environments)
-while True:
-    pass
-
 
 # Streamlit configuration
 st.set_page_config(page_title="SonicVault", page_icon="🔒", layout="wide")

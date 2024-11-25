@@ -1,5 +1,5 @@
-# SonicVault
-SonicVault is an innovative web app that securely encodes and encrypts messages into audio files. Utilizing Streamlit for a user-friendly interface, SonicVault enables users to encode messages as composite audio signals and encrypts frequency mappings with an AES encryption key. The app also offers a streamlined decoding process, which reconstructs the original message using the audio file, frequency key, and encryption key.
+# WebCryptor
+WebCryptor is an innovative web app that securely encodes and encrypts messages into audio files. Utilizing Streamlit for a user-friendly interface, WebCryptor enables users to encode messages as composite audio signals and encrypts frequency mappings with an AES encryption key. The app also offers a streamlined decoding process, which reconstructs the original message using the audio file, frequency key, and encryption key.
 
 # Key Features
 ## Message Encoding to Audio:

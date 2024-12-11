@@ -13,7 +13,7 @@ from io import BytesIO
 import zipfile
 
 # Streamlit configuration
-st.set_page_config(page_title="SonicVault", page_icon="🔒", layout="wide")
+st.set_page_config(page_title="WaveCryptor", page_icon="🔒", layout="wide")
 
 # Custom CSS for Techno look
 st.markdown("""
@@ -81,7 +81,7 @@ st.markdown("""
 
 
 # Header
-st.markdown("<h1 class='title'>SonicVault: Encrypt Your Secrets with Sound</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>WaveCryptor: Encrypt Your Secrets with Sound</h1>", unsafe_allow_html=True)
 st.write("Welcome to **SonicVault**, a fun and secure way to send messages using sound frequencies! Use this app to encode your secret message, encrypt it, and listen to it as an audio file.")
 
 # Frequency map generator

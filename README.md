@@ -17,3 +17,7 @@ NumPy & SciPy: For signal processing and audio manipulation.
 Cryptography: For AES-based encryption to securely encode frequency mappings.
 # Setup
 Clone the repository, install dependencies with requirements.txt, and deploy on Heroku or locally to transform your messages into secure, shareable audio files.
+
+## If you use WaveCryptor, please cite:
+
+S. Pemasinghe, "WaveCryptor: A Secure Hybrid Framework Combining Encryption and Steganography via Frequency Mapping," 2025 5th International Conference on Advanced Research in Computing (ICARC), Belihuloya, Sri Lanka, 2025, pp. 1-6, doi: 10.1109/ICARC64760.2025.10962964.
